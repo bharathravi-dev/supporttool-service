@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import http from "http";
 import session from 'express-session';
 import { check, validationResult } from 'express-validator';
@@ -43,10 +42,9 @@ const app = express();
 // Trust the first proxy (nginx/load balancer) so req.ip returns the real client IP
 // from the x-forwarded-for header set by the proxy
 app.set('trust proxy', 1);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(express.json());
+// Allow large JSON payloads, including 5 MB requests with JSON overhead.
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 
 const PgSession = connectPgSimple(session);
